@@ -85,14 +85,14 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   const { id } = request.params;
   const { user } = request;
 
-  const indexTodo = user.todos.findIndex(todo => todo.id === id);
+  const todo = user.todos.find(todo => todo.id === id);
 
-  if (indexTodo < 0) {
+  if (!todo) {
     return response.status(404).json({ error: 'Todo not found! '});
   }
 
-  user.todos[indexTodo].done = true;
-  return response.status(201).json(user.todos[indexTodo]);
+  todo.done = true;
+  return response.status(201).json(todo);
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
