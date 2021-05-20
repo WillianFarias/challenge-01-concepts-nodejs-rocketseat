@@ -17,7 +17,7 @@ function checksExistsUserAccount(request, response, next) {
   const user = users.find(user => user.username === username);
 
   if(!user) {
-    return response.status(400).json({ error: 'User already registered! '});
+    return response.status(404).json({ error: 'User already registered! '});
   }
 
   request.user = user;
@@ -73,7 +73,7 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const indexTodo = user.todos.findIndex(todo => todo.id === id);
 
   if (indexTodo < 0) {
-    return response.status(400).json({ error: 'Todo not found!' });
+    return response.status(404).json({ error: 'Todo not found!' });
   }
 
   user.todos[indexTodo].title = title;
@@ -83,11 +83,31 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { id } = request.query;
+  const { user } = request;
+
+  const indexTodo = user.todos.findIndex(todo => todo.id === id);
+
+  if (indexTodo < 0) {
+    return response.status(404).json({ error: 'Todo not found! '});
+  }
+
+  user.todos[indexTodo].done = true;
+  return response.status(200).json(user.todos[indexTodo]);
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { id } = request.query;
+  const { user } = request;
+
+  const indexTodo = user.todos.findIndex(todo => todo.id === id);
+  
+  if (indexTodo < 0) { 
+    return response.status(404).json({ error: 'Todo not found! '});
+  }
+
+  user.todos.splice(indexTodo, 1);
+  return response.status(204).send();
 });
 
 module.exports = app;
